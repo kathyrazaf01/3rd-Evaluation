@@ -2,10 +2,51 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ClientController;
+use Illuminate\Http\Request;
 
-Route::get('/', function () {
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+// Route::group(['middleware' => ['check.client.session']], function () {
+   
+//     // Vous pouvez ajouter plus de routes 
+// });
+
+Route::get('/main', function () {
     return view('main');
 })->name('main');
+
+
+Route::get('/', function () {
+    return view('login/loginclient');
+})->name('loginclient');
+
+Route::get('/admin', function () {
+    return view('login/loginadmin');
+})->name('loginadmin');
+
+Route::get('/proprietaire', function () {
+    return view('login/loginproprietaire');
+})->name('loginproprietaire');
+
+Route::get('/indexclient', function () {
+    return view('client/indexclient');
+})->name('indexclient');
+
+Route::get('/detailslocation', function () {
+    return view('client/detailslocation');
+})->name('detailslocation');
+
+Route::post('/logclient', [LoginController::class, 'logclient'])->name('logclient');
+
+Route::post('/filtredate', [ClientController::class, 'filtredate'])->name('filtredate');
+
+
+
+Route::get('/detailslocation/{idbien}', [ClientController::class, 'detailslocation'])->name('detailslocation');
 
 Route::get('/404', function () {
     return view('404');
@@ -30,6 +71,7 @@ Route::get('/element', function () {
 Route::get('/form', function () {
     return view('form');
 })->name('form');
+
 
 Route::get('/signin', function () {
     return view('signin');
