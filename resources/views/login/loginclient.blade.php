@@ -17,7 +17,7 @@
                         <div class="alert alert-primary" role="alert">
                             {{ session('error') }}
                         </div>
-                    @endif
+                     @endif
                         <form action="{{route('logclient')}}" method="POST">
                             @csrf
                             <div class="form-floating mb-3">

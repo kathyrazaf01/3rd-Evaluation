@@ -4,11 +4,23 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProprioController;
+use App\Http\Controllers\AdminController;
+
+use App\Models\Proprio;
 use Illuminate\Http\Request;
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+Route::group(['middleware' => ['check.client.session']], function () {
+    Route::get('/indexclient', function () {
+        return view('client/indexclient');
+    })->name('indexclient');
+    // Ajoutez ici d'autres routes protégées par la session
+});
+
 
 // Route::group(['middleware' => ['check.client.session']], function () {
    
@@ -24,11 +36,11 @@ Route::get('/', function () {
     return view('login/loginclient');
 })->name('loginclient');
 
-Route::get('/admin', function () {
+Route::get('/loginadmin', function () {
     return view('login/loginadmin');
 })->name('loginadmin');
 
-Route::get('/proprietaire', function () {
+Route::get('/loginproprietaire', function () {
     return view('login/loginproprietaire');
 })->name('loginproprietaire');
 
@@ -36,17 +48,52 @@ Route::get('/indexclient', function () {
     return view('client/indexclient');
 })->name('indexclient');
 
-Route::get('/detailslocation', function () {
-    return view('client/detailslocation');
-})->name('detailslocation');
+
+Route::get('/indexproprio', function () {
+    return view('proprietaire/indexproprio');
+})->name('indexproprio');
+
+Route::get('/indexadmin', function () {
+    return view('admin/indexadmin');
+})->name('indexadmin');
+
+Route::get('/importcsvbien', function () {
+    return view('admin/importcsvbien');
+})->name('importcsvbien');
+
+Route::get('/importcsvlocation', function () {
+    return view('admin/importcsvlocation');
+})->name('importcsvlocation');
+
+
+
 
 Route::post('/logclient', [LoginController::class, 'logclient'])->name('logclient');
 
-Route::post('/filtredate', [ClientController::class, 'filtredate'])->name('filtredate');
+Route::post('/logproprio', [LoginController::class, 'logproprio'])->name('logproprio');
 
-
+Route::post('/logadmin', [LoginController::class, 'logadmin'])->name('logadmin');
 
 Route::get('/detailslocation/{idbien}', [ClientController::class, 'detailslocation'])->name('detailslocation');
+
+Route::get('/importbien', [AdminController::class, 'importbien'])->name('importbien');
+
+Route::get('/importlocation', [AdminController::class, 'importlocation'])->name('importlocation');
+
+Route::get('/detailsproprio/{idproprio}', [ProprioController::class, 'detailsproprio'])->name('detailsproprio');
+
+Route::get('/showchart', [AdminController::class, 'showchart'])->name('showchart');
+
+Route::get('/detailsbien/{idbien}', [ProprioController::class, 'detailsbien'])->name('detailsbien');
+
+Route::post('/filtredate', [ClientController::class, 'filtredate'])->name('filtredate');
+
+Route::get('/deconnexionclient', [LoginController::class, 'deconnexionclient'])->name('deconnexionclient');
+
+Route::get('/deconnexionadmin', [LoginController::class, 'deconnexionadmin'])->name('deconnexionadmin');
+
+Route::get('/deconnexionprop', [LoginController::class, 'deconnexionprop'])->name('deconnexionprop');
+
 
 Route::get('/404', function () {
     return view('404');

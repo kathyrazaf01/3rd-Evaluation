@@ -1,8 +1,30 @@
 
 
+delete  from proprietebien
+
+delete  from proprietaire
+
+delete from photo
+
+delete from locationclient
+
+delete from bien
+
+DELETE FROM typebien
+
+DELETE from client
+
+delete from proprietaire
+
+
+
+
+
+
+
 --
 
-CREATE OR viewlocationclientpaiement AS
+CREATE OR replace VIEW viewlocationclientpaiement AS
  SELECT loc.idlocation,
     loc.idclient,
     loc.idbien,
@@ -27,6 +49,23 @@ CREATE OR viewlocationclientpaiement AS
      JOIN bien b ON loc.idbien = b.idbien
      JOIN typebien tb ON b.idtypeb = tb.idtypeb;
 
+
+Create or replace view viewpropbien as 
+select pb.*,
+tp.idtypep,
+tp.nomtypep,
+prop.nomprop,
+tb.idtypeb,
+tb.nomtypeb,
+b.nombien,
+b.region,
+b.loyer
+from 
+typepersonne tp 
+join proprietaire prop on prop.idtypep = tp.idtypep
+join proprietebien pb on pb.idprop = prop.idprop
+join bien b on pb.idbien = b.idbien
+join typebien tb on b.idtypeb = tb.idtypeb
 
 -- Table: public.typebien
 
@@ -405,3 +444,104 @@ SELECT
 FROM
     locationclient l
 	join date_params d on l.datedebut <= d.date2;
+
+
+bien1 = 15-07-2024 | 3 mois | 5000/ mois | commission 10%
+1er tranche : 15-07-2024r
+2 eme tranche: 01-08-2024
+3 eme tranche: 01-09-2024
+—————————
+bien2 = 12-08-2024 | 2 mois | 7000/mois | commission 5%
+1er Tranche : 12-08-2024
+2eme tranche : 01-09-2024
+—————————
+bien3 = 24-06-2024 | 5 mois | 3000/mois | commission 5%
+1er tranche 24-06-2024
+2eme tranche 01-07-2024
+3eme tranche 01-08-2024
+4eme tranche 01-09-2024
+5eme tranche 01-10-2024
+—————————
+Ex 1 Filtre chiffer daffaire et gain 
+Date 1 = 16-07-2024
+Date 2 = 12-09-2024
+
+
+D1(2,3),D2(1,2),D3(3,4)
+Donc
+chiffer d'affaire = 2x5000 + 2x7000 + 2x3000
+chiffer d'affaire = 30 000ar
+
+Gain = 2x5000x10/100 + 2x7000x5/100 + 2x3000x5/100
+Gain = 2 000ar
+
+De sitria avoka par mois 
+-07-2024
+chiffer d'affaire = 0
+Gain = 0
+-08-2024
+D1(2),D2(1),D3(3)
+chiffer d'affaire = 15 000ar
+Gain = 1000ar
+-09-2024
+D1(3),D2(2),D3(4)
+CA = 15 000ar
+Gain = 1000ar
+
+
+
+
+
+
+
+WITH date_params AS (
+    SELECT
+        '".$date1."'::date AS date1,
+        '".$date2."'::date AS date2
+),
+payment_schedules AS (  
+ SELECT
+        lc.idbien,
+        b.loyer,
+        t.commission,
+        generate_series(
+            lc.datedebut,
+            lc.datedebut + (lc.duree * interval '1 month'),
+            interval '1 month'
+        ) AS payment_date
+    FROM
+        locationclient lc
+    JOIN
+        bien b ON lc.idbien = b.idbien
+	
+	JOIN typebien t on b.idtypeb = t.idtypeb
+	),
+	filtered_payments AS (
+    SELECT
+        ps.idbien,
+        ps.loyer,
+        ps.commission,
+        ps.payment_date
+    FROM
+        payment_schedules ps
+    JOIN
+        date_params dp ON ps.payment_date BETWEEN dp.date1 AND dp.date2
+),
+revenue_by_month AS (
+    SELECT
+        EXTRACT(YEAR FROM payment_date) AS year,
+        EXTRACT(MONTH FROM payment_date) AS month,
+	 TO_CHAR(payment_date, 'Month') AS month_name,
+        SUM(loyer) AS total_revenue,
+        SUM(loyer * commission / 100) AS total_gain
+	
+    FROM
+        filtered_payments
+	
+    GROUP BY
+        EXTRACT(YEAR FROM payment_date),
+	 EXTRACT(MONTH FROM payment_date),
+        TO_CHAR(payment_date, 'Month')
+
+)
+select * from revenue_by_month order by  month

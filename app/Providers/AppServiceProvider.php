@@ -31,8 +31,24 @@ class AppServiceProvider extends ServiceProvider
             $view->with('locations', $locations);
         });
 
+        View::composer('*', function ($view) {
+            $idprop = session('idprop');
+            $listebiens = DB::select('select distinct idbien,nombien, idtypeb, nomtypeb,idprop from viewpropbien where idprop = ?', [$idprop]);
+
+            $view->with('listebiens', $listebiens);
+        });
+
+
         View::share('idclient', function() {
             return session('idclient');
+        });
+
+        View::share('idprop', function() {
+            return session('idprop');
+        });
+
+        View::share('idadmin', function() {
+            return session('idadmin');
         });
     }
 }

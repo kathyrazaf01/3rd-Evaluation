@@ -31,7 +31,6 @@
                             <h6 class="mb-4">Liste des Locations</h6>
                             <table class="table">
                                 <thead>
-                                   
                                     <tr>
                                         <th scope="col">Location</th>
                                         
