@@ -95,11 +95,61 @@ $formattedResults = array_map(function($result) {
         
     }
 
-    public function importcsvbien(){
-        // $bien = $this->admin->importcsvbien();
+    public function importcsvbien(Request $request){
+        $file =  $request->file('bien');
+        $file2 =  $request->file('typebien');
+        $file3 =  $request->file('location');
+        $this->admin->importcsvbien($file,$file2,$file3);
+        
+        // return $csv;
+
+        return back()->with('success', 'Nouveaux biens ajoutés');
     }
 
-    public function importcsvlocation(){
-                // $bien = $this->admin->importcsvlocation();
+    public function insertnewlocation(Request $request){
+        $idbien = $request->input('idbien');
+        $idclient = $request->input('idclient');
+        $duree = $request->input('duree');
+        $datedebut = $request->input('datedebut');
+
+        $insertionlocation = $this->admin->insertlocation($idclient,$idbien,$duree,$datedebut);
+
+        return $insertionlocation;
     }
+
+    public function listebien(){
+    
+            $idbien = 48;
+            $detailsbiens = DB::table('viewtypebien')->where('idbien',$idbien)->get();
+
+            $detailsbiensArray = $detailsbiens->toArray();
+            $idbiens = $detailsbiens->pluck('idbien')->toArray();
+            $idtypebiens = $detailsbiens->pluck('idtypeb')->toArray();
+            
+            return view('admin/listebien', [
+                'detailsbiensArray' => $detailsbiensArray,
+                'idbiens' => $idbiens,
+                'idtypebiens' => $idtypebiens
+            ]);
+
+
+    }
+
+    public function delete(){
+        $this->admin->deletedata();
+        return back()->with('success', 'données réinitialisées avec succes');
+    }
+
+    public function showpaiement(){
+
+        $paiements = $this->admin->affallpaiement();
+        return $paiements;
+    }
+
+
+
+    // public function detailstypebien($idbien){
+    //     $detailsbiens = $this->admin->detailstypebien($idbien);
+    //     return view('admin/detailsbien', ['detailsbiens' => $detailsbiens]);
+    // }
 }

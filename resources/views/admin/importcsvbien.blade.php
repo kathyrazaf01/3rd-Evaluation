@@ -7,7 +7,7 @@
             <div class="bg-secondary rounded h-100 p-4">
                 <h6 class="mb-4">CSV Import Bien</h6>
                 <div class="mb-3">
-                    <form action="{{route('importcsvbien')}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('importbien')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @if ($errors->any())
                         @foreach ($errors->all() as $error)
@@ -21,8 +21,18 @@
                             {{ session('success') }}
                         </div>
                         @endif
-                        <label for="formFile" class="form-label"></label>
-                        <input class="form-control bg-dark" type="file" id="formFile" name="csv_file">
+                        <label for="formFile" class="form-label">Biens</label>
+                        <input class="form-control bg-dark" type="file" id="formFile" name="bien">
+
+                        <p class="p-4"></p>
+                        <label for="formFile" class="form-label">Type Bien & commission</label>
+                        <input class="form-control bg-dark" type="file" id="formFile" name="typebien">
+
+                        <p class="p-4"></p>
+                        <label for="formFile" class="form-label">Location</label>
+                        <input class="form-control bg-dark" type="file" id="formFile" name="location">
+
+                        <p class="p-3"></p>
 
                         <button type="submit" class="btn btn-primary mt-3">Submit</button>
                         <button type="button" class="btn btn-link m-2"><a href="{{ route('indexadmin') }}">return</a></button>

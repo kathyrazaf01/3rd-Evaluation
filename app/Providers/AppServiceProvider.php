@@ -38,6 +38,20 @@ class AppServiceProvider extends ServiceProvider
             $view->with('listebiens', $listebiens);
         });
 
+        View::composer('*', function ($view) {
+            $clients = DB::select('select * from client');
+            $view->with('clients', $clients);
+        });
+
+      
+
+     
+        View::composer('*', function ($view) {
+          
+            $biens = DB::select('select * from bien');
+            $view->with('biens', $biens);
+        });
+
 
         View::share('idclient', function() {
             return session('idclient');

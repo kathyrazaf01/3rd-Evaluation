@@ -53,10 +53,6 @@ Route::get('/indexproprio', function () {
     return view('proprietaire/indexproprio');
 })->name('indexproprio');
 
-Route::get('/indexadmin', function () {
-    return view('admin/indexadmin');
-})->name('indexadmin');
-
 Route::get('/importcsvbien', function () {
     return view('admin/importcsvbien');
 })->name('importcsvbien');
@@ -65,8 +61,18 @@ Route::get('/importcsvlocation', function () {
     return view('admin/importcsvlocation');
 })->name('importcsvlocation');
 
+Route::get('/insertlocation', function () {
+    return view('admin/insertlocation');
+})->name('insertlocation');
 
 
+Route::get('/listebien', function () {
+    return view('admin/listebien');
+})->name('listebien');
+
+Route::get('/indexadmin', [AdminController::class, 'showpaiement'])->name('indexadmin');
+
+Route::get('/listebien', [AdminController::class, 'listebien'])->name('listebien');
 
 Route::post('/logclient', [LoginController::class, 'logclient'])->name('logclient');
 
@@ -76,13 +82,19 @@ Route::post('/logadmin', [LoginController::class, 'logadmin'])->name('logadmin')
 
 Route::get('/detailslocation/{idbien}', [ClientController::class, 'detailslocation'])->name('detailslocation');
 
-Route::get('/importbien', [AdminController::class, 'importbien'])->name('importbien');
+Route::post('/importbien', [AdminController::class, 'importcsvbien'])->name('importbien');
 
-Route::get('/importlocation', [AdminController::class, 'importlocation'])->name('importlocation');
+Route::post('/importlocation', [AdminController::class, 'importlocation'])->name('importlocation');
 
 Route::get('/detailsproprio/{idproprio}', [ProprioController::class, 'detailsproprio'])->name('detailsproprio');
 
 Route::get('/showchart', [AdminController::class, 'showchart'])->name('showchart');
+
+Route::get('/delete', [AdminController::class, 'delete'])->name('delete');
+
+Route::get('/detailstypebien/{idbien}', [AdminController::class, 'detailstypebien'])->name('detailstypebien');
+
+Route::post('/insertnewlocation', [AdminController::class, 'insertnewlocation'])->name('insertnewlocation');
 
 Route::get('/detailsbien/{idbien}', [ProprioController::class, 'detailsbien'])->name('detailsbien');
 

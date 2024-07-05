@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Client;
+use App\Models\Bien;
+use App\Models\Location;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+class AdminPageController extends Controller
+{
+    public function viewAdminPage()
+    {
+        return view('admin.AdminPage');
+    }
+
+    public function viewInsertLocation()
+    {
+        $adminController = app()->make(AdminPageController::class);
+        $client = $adminController->getAllClient()->getData()['client'];
+
+        $adminController = app()->make(AdminPageController::class);
+        $bien = $adminController->getAllBien()->getData()['bien'];
+
+
+        return view('admin.InsertLocation',compact('client','bien'));
+    }
+
+    public function getAllClient()
+    {
+        $client = Client::all();
+        return view('admin.InsertLocation',compact('client'));
+    }
+
+    public function getAllBien()
+    {
+        $bien = Bien::all();
+        return view('admin.InsertLocation',compact('bien'));
+    }
+
+    public function selectWhereViewLocation($reference)
+    {
+
+        $location = DB::table('v_location')
+        ->where('id_bien', $reference)
+        ->get();
+
+        $id_bien = $location->pluck('id_bien')->toArray();
+        $commission = $location->pluck('commission')->toArray();
+        $id_proprietaire = $location->pluck('id_proprietaire')->toArray();
+        $loyer = $location->pluck('loyer')->toArray();
+        $reference = $location->pluck('reference')->toArray();
+
+
+        return $location;
+    }
+
+
+
+    public function generateLocation($date_debut, $duree, $designation, $loyer, $id_proprietaire, $commission, $id_client)
+{
+    $startDate = Carbon::createFromFormat('Y-m-d', date('Y-m-01', strtotime($date_debut)));
+
+    for ($i = 0; $i < $duree; $i++) {
+        $currentDate = $startDate->copy()->addMonths($i);
+
+        if ($i == 0) {
+            DB::insert(
+                'insert into detail_location (mois, reference, loyer, commission, num_mois_location, valeur_commission, id_proprietaire, id_client)
+                values (?, ?, ?, ?, ?, ?, ?, ?)',
+                [$currentDate, $designation, $loyer * 2, 100, $i + 1, $loyer, $id_proprietaire, $id_client]
+            );
+        } else {
+            DB::insert(
+                'insert into detail_location (mois, reference, loyer, commission, num_mois_location, valeur_commission, id_proprietaire, id_client)
+                values (?, ?, ?, ?, ?, ?, ?, ?)',
+                [$currentDate, $designation, $loyer, $commission, $i + 1, ($loyer * ($commission / 100)), $id_proprietaire, $id_client]
+            );
+        }
+    }
+}
+
+
+    public function insertLocation(Request $request)
+    {
+        $id_client = $request->id_client;
+        $id_bien = $request->id_bien;
+        $duree = $request->duree;
+        $date_debut = $request->date_debut;
+
+        Location::create([
+            'id_client' =>$id_client,
+            'id_bien' =>$id_bien,
+            'duree' =>$duree,
+            'date_debut'=>$date_debut,
+        ]);
+
+        $data =$this-> selectWhereViewLocation($id_bien);
+        $commission = $data->pluck('commission')->toArray();
+        $id_proprietaire = $data->pluck('id_proprietaire')->toArray();
+        $loyer = $data->pluck('loyer_par_mois')->toArray();
+        $reference = $data->pluck('reference')->toArray();
+
+        $this->generateLocation($date_debut,$duree,$reference[0],$loyer[0],$id_proprietaire[0],$commission[0],$id_client);
+
+        return redirect()->route('Viewlocation');
+    }
+
+
+
+
+}

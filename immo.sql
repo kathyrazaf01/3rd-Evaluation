@@ -1,20 +1,44 @@
 
 
+
+
 delete  from proprietebien
-
-delete  from proprietaire
-
-delete from photo
-
-delete from locationclient
-
-delete from bien
-
-DELETE FROM typebien
-
-DELETE from client
-
+;
 delete from proprietaire
+;
+delete from photo
+;
+delete from locationclient
+;
+delete from bien
+;
+DELETE FROM typebien
+;
+DELETE from client
+;
+delete from proprietaire
+;
+delete from importcsvbien
+;
+delete from importcsvtypebien
+;
+delete from importcsvlocation
+
+
+
+ with clientha as (
+	 select idclient, email from client where email in 
+	 (select client from importcsvlocation)
+ ),
+ bienha as(
+ 	select b.idbien,imp.reference,
+	 imp."Date_debut",
+	 imp.duree_mois
+	 from 
+	 bien b join importcsvlocation imp on imp.reference = b.reference
+	
+ )
+
 
 
 
@@ -545,3 +569,15 @@ revenue_by_month AS (
 
 )
 select * from revenue_by_month order by  month
+
+create or replace view viewtypebien as
+ SELECT
+    b.nombien,
+    b.region,
+    b.loyer,
+    b.idtypeb,
+    tb.nomtypeb,
+    tb.commission
+   FROM 
+     bien b
+     JOIN typebien tb ON b.idtypeb = tb.idtypeb;
